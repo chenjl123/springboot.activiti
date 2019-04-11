@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"></meta>
+<title>Insert title here</title>
+</head>
+<body>
+	<div style="margin-left:500px;margin-top:50px;">
+		待审核列表
+		<table border="1">
+			<thead>
+				<tr><td>工号</td><td>请假天数</td><td>请假原因</td><td>操作</td></tr>
+			</thead>
+			<tbody id="tbody">
+			
+			</tbody>
+		</table>
+	</div>
+	<div style="margin-left:500px;margin-top:50px;">
+		已审核列表
+		<table border="1">
+			<thead>
+				<tr><td>工号</td><td>请假天数</td><td>请假原因</td><td>状态</td><td>审批原因</td></tr>
+			</thead>
+			<tbody id="hitbody">
+			
+			</tbody>
+		</table>
+	</div>
+</body>
+<script src="jquery.js" type="text/javascript"></script>
+<script type="text/javascript">
+	function listByUser(){
+		 $.ajax({
+			 url:"listByUser",
+			 data:{"jobNumber": "003"},
+			 type:"get",
+			 success:function(result){
+				console.log(result);
+	        	var html = "";
+	        	result.forEach(function(v){  
+	        		html += "<tr>";
+					html += "<td>" + v.jobNumber + "</td>";
+					html += "<td>" + v.days + "</td>";
+					html += "<td>" + v.reason + "</td>";
+					html += '<td><button type="button" onclick="audit(0,'+v.taskId+')">通过</button><button type="button" onclick="audit(2,'+v.taskId+')">不通过</button></td>';
+					html += "</tr>";
+	        	});
+				$("#tbody").html(html);
+	         }
+		 });
+	}
+	listByUser();
+	
+	function hiTaskList(){
+		 $.ajax({
+			 url:"hiTaskList",
+			 data:{"jobNumber": "003"},
+			 type:"get",
+			 success:function(result){
+				console.log(result);
+	        	var html = "";
+	        	result.forEach(function(v){  
+	        		html += "<tr>";
+					html += "<td>" + v.jobNumber + "</td>";
+					html += "<td>" + v.days + "</td>";
+					html += "<td>" + v.reason + "</td>";
+					html += "<td>" + v.mstatus + "</td>";
+					html += "<td>" + v.mauditReason + "</td>";
+					html += "</tr>";
+	        	}); 
+				$("#hitbody").html(html);
+	         }
+		 });
+	}
+	hiTaskList();
+	
+	function audit(status, taskId){
+		var auditReason = "";
+		if(status == 2){
+			auditReason = "003审批不通过";
+		}
+		 $.ajax({
+			 url:"divisionManagerAudit",
+			 data:{"taskId": taskId,"mauditReason":auditReason, "mstatus": status},
+			 type:"post",
+			 success:function(result){
+				 listByUser();
+				 hiTaskList();
+	         }
+		 });
+	}
+</script>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8"></meta>
+<title>Insert title here</title>
+</head>
+<body>
+	<button type="button" id="listTask">查询所有任务</button>
+	<button type="button" id="higher">上级审核</button>
+	<button type="button" id="manager">经理审核</button>
+	<hr></hr>
+	<form action="">
+		工号:<input type="text" name="jobNumber" id="jobNumber"/>
+		请假天数:<input type="text" name="leaveDays" id="leaveDays"/>
+		请假原因:<input type="text" name="leaveReason" id="leaveReason"/>
+		<button type="button" id="submit">提交请假单</button>
+	</form>
+	<div style="margin-left:500px;margin-top:50px;">
+		<table border="1">
+			<thead>
+				<tr><td>请假天数</td><td>请假原因</td><td>状态</td></tr>
+			</thead>
+			<tbody id="tbody">
+			
+			</tbody>
+		</table>
+	</div>
+</body>
+<script src="jquery.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+	$("#listTask").bind("click", function(){
+		 $.ajax({
+			 url:"toShowTask",
+			 type:"get",
+			 success:function(result){
+	        	console.log(result);
+	         }
+		 });	
+	});
+
+	$("#manager").bind("click", function(){
+		window.open("viewTaskManager");	
+	});
+	
+	$("#higher").bind("click", function(){
+		window.open("viewTaskHigher");	
+	});
+	
+	function loadApplyList(){
+		 $.ajax({
+			 url:"applyList",
+			 data:{"jobNumber": "001"},
+			 type:"get",
+			 success:function(result){
+				console.log(result);
+	        	var html = "";
+	        	result.forEach(function(v){  
+	        		html += "<tr>";
+					html += "<td>" + v.days + "</td>";
+					html += "<td>" + v.reason + "</td>";
+					html += "<td>" + v.status + "</td>";
+					html += "</tr>";
+	        	});
+				$("#tbody").html(html);
+	         }
+		 });
+	}
+	loadApplyList();
+	
+	$("#submit").bind("click", function(){
+		 $.ajax({
+			 url:"employeeApply",
+			 data:{"jobNumber": $("#jobNumber").val(),"leaveDays": $("#leaveDays").val(),"leaveReason": $("#leaveReason").val()},
+			 type:"post",
+			 success:function(result){
+	        	alert(result);
+	        	loadApplyList();
+	         }
+		 });
+	});
+	
+</script>
+</html>
